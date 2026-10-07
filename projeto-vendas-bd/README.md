@@ -6,21 +6,21 @@
 - Professor: Anderson
 
 ## Sobre o projeto
-Este projeto é um sistema web de vendas pensado para demonstrar, na prática, como o PostgreSQL pode ir além do armazenamento de dados e realizar processamento diretamente no banco.
+Este projeto é um sistema web de vendas desenvolvido para demonstrar, na prática, como o PostgreSQL pode ir além do armazenamento de dados e executar processamento diretamente no banco.
 
-A aplicação foi desenvolvida para atender ao fluxo diário de um pequeno comércio, com foco em:
-- cadastro de clientes;
-- cadastro de produtos;
-- registro de vendas com validação de estoque;
-- cálculo automático do valor final da venda;
-- consulta a um relatório consolidado.
+A aplicação foi criada para resolver o fluxo cotidiano de um pequeno comércio, permitindo:
+- cadastrar clientes;
+- cadastrar produtos;
+- registrar vendas com validação de estoque;
+- calcular o valor final de cada venda automaticamente;
+- consultar um relatório consolidado das vendas realizadas.
 
 Para isso, o sistema utiliza:
-- 1 view para consolidar informações das vendas;
+- 1 view para gerar um relatório agregado;
 - 1 function para calcular o total final de uma venda;
-- 1 procedure para registrar uma venda em uma única transação, garantindo consistência e ajuste de estoque.
+- 1 procedure para registrar uma venda em uma única transação, com validações e baixa de estoque.
 
-Assim, o problema resolvido é o cotidiano de um mercado ou pequeno comércio: registrar clientes e produtos, processar vendas com segurança e consultar informações agregadas de forma eficiente.
+O objetivo principal é tornar o processo de vendas mais seguro, organizado e eficiente, garantindo que as informações sejam tratadas com consistência no banco de dados.
 
 ## Tecnologias utilizadas
 - Linguagem: Python 3.11+
@@ -34,7 +34,7 @@ Assim, o problema resolvido é o cotidiano de um mercado ou pequeno comércio: r
 ## Banco de dados
 
 ### SGBD
-O projeto foi desenvolvido para rodar com PostgreSQL local (versão 13 ou superior). A conexão da aplicação é feita pela variável `DATABASE_URL`.
+O projeto foi pensado para funcionar com PostgreSQL local, versão 13 ou superior. A aplicação se conecta ao banco por meio da variável `DATABASE_URL`.
 
 ### Principais tabelas
 - `clientes` — id, nome, email, telefone, criado_em
@@ -42,7 +42,7 @@ O projeto foi desenvolvido para rodar com PostgreSQL local (versão 13 ou superi
 - `vendas` — id, id_cliente, data_venda, desconto_percentual
 - `itens_venda` — id, id_venda, id_produto, quantidade, preco_unitario
 
-Todas as tabelas possuem chaves primárias, chaves estrangeiras e checks para garantir integridade, como:
+Essas tabelas possuem chaves primárias, chaves estrangeiras e checks para garantir integridade, como:
 - preço maior ou igual a zero;
 - estoque maior ou igual a zero;
 - quantidade maior que zero;
@@ -54,7 +54,7 @@ Todas as tabelas possuem chaves primárias, chaves estrangeiras e checks para ga
 |---|---|---|---|
 | View | `vw_relatorio_vendas` | Junta informações de vendas, clientes e itens para gerar um resumo por venda | Relatório de vendas |
 | Function | `fn_total_venda(p_id_venda)` | Soma os itens da venda e aplica o percentual de desconto, retornando o total final | Detalhe da venda |
-| Procedure | `sp_realizar_venda(p_id_cliente, p_itens jsonb, p_desconto)` | Realiza a venda em uma única transação, validando cliente, estoque e itens antes de confirmar a operação | Cadastro de venda |
+| Procedure | `sp_realizar_venda(p_id_cliente, p_itens jsonb, p_desconto)` | Realiza a venda em uma única transação, validando cliente, estoque e itens antes da confirmação da operação | Cadastro de venda |
 
 ## Estrutura do repositório
 ```text
@@ -103,7 +103,7 @@ No terminal ou no pgAdmin, rode:
 psql -U postgres -c "CREATE DATABASE mercado_pro;"
 ```
 
-Ou execute o script `database/00_criar_banco.sql` conectado como `postgres`.
+Se preferir, também é possível executar o script `database/00_criar_banco.sql` conectado como `postgres`.
 
 ### 3. Rodar os scripts SQL na ordem correta
 Conecte-se ao banco recém-criado e execute os arquivos abaixo, na sequência:
@@ -115,7 +115,7 @@ psql -U postgres -d mercado_pro -f database/procedures/04_sp_realizar_venda.sql
 psql -U postgres -d mercado_pro -f database/inserts/05_dados_exemplo.sql
 ```
 
-Se preferir, abra o pgAdmin, selecione o banco `mercado_pro`, use o Query Tool e execute os arquivos um por um, nessa mesma ordem.
+Se achar mais prático, abra o pgAdmin, selecione o banco `mercado_pro`, use o Query Tool e execute os arquivos um por um, nessa mesma ordem.
 
 ### 4. Configurar o arquivo `.env`
 Copie o arquivo `.env.example` para `.env` e edite a variável:
@@ -123,7 +123,7 @@ Copie o arquivo `.env.example` para `.env` e edite a variável:
 DATABASE_URL=postgresql://postgres:SUA_SENHA@localhost:5432/mercado_pro
 ```
 
-Substitua `SUA_SENHA` pela senha do usuário `postgres` que você definiu durante a instalação.
+Substitua `SUA_SENHA` pela senha do usuário `postgres` definida durante a instalação.
 
 ### 5. Instalar dependências e iniciar a aplicação
 ```bash
@@ -137,7 +137,7 @@ source venv/bin/activate
 
 pip install -r requirements.txt
 
-# Opcional: testar a conexão com o banco e confirmar os objetos criados
+# Opcional: testar a conexão com o banco e verificar os objetos criados
 python src/testar_conexao.py
 
 python src/app.py
@@ -152,7 +152,7 @@ http://127.0.0.1:5000
 - `password authentication failed` — a senha do PostgreSQL no arquivo `.env` está incorreta.
 - `could not connect to server` — o serviço do PostgreSQL não está ativo. No Windows, inicie o serviço pelo gerenciador de serviços.
 - `database "mercado_pro" does not exist` — o banco ainda não foi criado ou você está acessando o banco errado.
-- `relation "clientes" does not exist` — os scripts SQL não foram executados no banco certo.
+- `relation "clientes" does not exist` — os scripts SQL não foram executados no banco correto.
 - Caracteres estranhos, como `cafÃ©`, indicam problema de encoding. Nesse caso, recrie o banco com UTF-8:
 ```bash
 CREATE DATABASE mercado_pro ENCODING 'UTF8' TEMPLATE template0;
@@ -162,4 +162,4 @@ CREATE DATABASE mercado_pro ENCODING 'UTF8' TEMPLATE template0;
 Link do vídeo: [inserir link do vídeo aqui]
 
 ## Observação
-Este projeto foi desenvolvido como parte de uma atividade acadêmica e tem como objetivo demonstrar, de forma prática, conceitos de modelagem de dados, SQL e integração com uma aplicação web.
+Este projeto foi desenvolvido como parte de uma atividade acadêmica e tem como objetivo demonstrar, de forma prática, conceitos de modelagem de dados, SQL e integração entre um banco relacional e uma aplicação web.
