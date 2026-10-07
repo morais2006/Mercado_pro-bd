@@ -1,9 +1,9 @@
 # Mercado Pro — Sistema de Vendas (Trabalho de Banco de Dados)
 
 ## Identificação
-- **Nome:** [COLOCAR MEU NOME]
-- **Disciplina:** Banco de Dados
-- **Professor:** [COLOCAR NOME DO PROFESSOR]
+- **Nome: João Manoel de Sousa Morais
+- **Disciplina: Banco de Dados
+- **Professor: Anderson
 
 ## Sobre o projeto
 Sistema web de vendas que demonstra, de forma prática, o uso de três
@@ -147,3 +147,5 @@ Abra <http://127.0.0.1:5000> no navegador.
   `psql -U postgres -d mercado_pro -c "\dt"`.
 - **Caracteres estranhos (ex.: "cafÃ©")** — o banco não está em UTF-8.
   Recrie com `CREATE DATABASE mercado_pro ENCODING 'UTF8' TEMPLATE template0;`.
+
+  link do meu vídeo [   ]
