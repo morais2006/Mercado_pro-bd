@@ -1,57 +1,63 @@
-# Mercado Pro — Sistema de Vendas (Trabalho de Banco de Dados)
+# Mercado Pro — Sistema de Vendas com PostgreSQL
 
 ## Identificação
-- **Nome: João Manoel de Sousa Morais
-- **Disciplina: Banco de Dados
-- **Professor: Anderson
+- Nome: João Manoel de Sousa Morais
+- Disciplina: Banco de Dados
+- Professor: Anderson
 
 ## Sobre o projeto
-Sistema web de vendas que demonstra, de forma prática, o uso de três
-recursos do PostgreSQL que fazem o banco **processar dados** (e não apenas
-armazená-los):
+Este projeto é um sistema web de vendas pensado para demonstrar, na prática, como o PostgreSQL pode ir além do armazenamento de dados e realizar processamento diretamente no banco.
 
-- 1 **View** para relatório agregado;
-- 1 **Function** para cálculo do total final de uma venda;
-- 1 **Procedure** para registrar uma venda em uma única transação, com
-  validações e baixa de estoque.
+A aplicação foi desenvolvida para atender ao fluxo diário de um pequeno comércio, com foco em:
+- cadastro de clientes;
+- cadastro de produtos;
+- registro de vendas com validação de estoque;
+- cálculo automático do valor final da venda;
+- consulta a um relatório consolidado.
 
-O problema resolvido é o dia-a-dia de um pequeno comércio/mercado:
-cadastrar clientes e produtos, registrar vendas (garantindo estoque e
-preço corretos) e consultar um relatório consolidado.
+Para isso, o sistema utiliza:
+- 1 view para consolidar informações das vendas;
+- 1 function para calcular o total final de uma venda;
+- 1 procedure para registrar uma venda em uma única transação, garantindo consistência e ajuste de estoque.
+
+Assim, o problema resolvido é o cotidiano de um mercado ou pequeno comércio: registrar clientes e produtos, processar vendas com segurança e consultar informações agregadas de forma eficiente.
 
 ## Tecnologias utilizadas
-- **Linguagem:** Python 3.11+
-- **Framework web:** Flask (Jinja2 para templates)
-- **Driver de banco:** psycopg2-binary (acesso direto, sem ORM)
-- **Variáveis de ambiente:** python-dotenv
-- **Front-end:** HTML + CSS próprio (tema escuro) + ícones SVG inline
-- **Banco de dados:** PostgreSQL (instalação local)
+- Linguagem: Python 3.11+
+- Framework web: Flask
+- Templates: Jinja2
+- Driver de banco: psycopg2-binary
+- Variáveis de ambiente: python-dotenv
+- Front-end: HTML + CSS próprio + ícones SVG inline
+- Banco de dados: PostgreSQL
 
 ## Banco de dados
 
 ### SGBD
-PostgreSQL local (versão 13 ou superior). A aplicação se conecta usando
-a connection string definida em `DATABASE_URL`.
+O projeto foi desenvolvido para rodar com PostgreSQL local (versão 13 ou superior). A conexão da aplicação é feita pela variável `DATABASE_URL`.
 
 ### Principais tabelas
-- `clientes` (id, nome, email, telefone, criado_em)
-- `produtos` (id, nome, preco, estoque)
-- `vendas` (id, id_cliente, data_venda, desconto_percentual)
-- `itens_venda` (id, id_venda, id_produto, quantidade, preco_unitario)
+- `clientes` — id, nome, email, telefone, criado_em
+- `produtos` — id, nome, preco, estoque
+- `vendas` — id, id_cliente, data_venda, desconto_percentual
+- `itens_venda` — id, id_venda, id_produto, quantidade, preco_unitario
 
-Todas com PKs, FKs e CHECKs (preço ≥ 0, estoque ≥ 0, quantidade > 0,
-desconto entre 0 e 100).
+Todas as tabelas possuem chaves primárias, chaves estrangeiras e checks para garantir integridade, como:
+- preço maior ou igual a zero;
+- estoque maior ou igual a zero;
+- quantidade maior que zero;
+- desconto entre 0 e 100.
 
-### Recursos de banco criados
+### Recursos criados no banco
 
-| Recurso | Nome | Finalidade | Usado na tela |
+| Recurso | Nome | Finalidade | Uso na aplicação |
 |---|---|---|---|
-| View | `vw_relatorio_vendas` | Junta vendas + clientes + itens_venda e retorna por venda: id, data, cliente, qtd. de itens e subtotal. | **Relatório de vendas** |
-| Function | `fn_total_venda(p_id_venda)` | Soma `quantidade * preco_unitario` dos itens e aplica o desconto da venda, retornando o total final. | **Detalhe da venda** |
-| Procedure | `sp_realizar_venda(p_id_cliente, p_itens jsonb, p_desconto)` | Em uma única transação: valida cliente e estoque, insere a venda, insere os itens pelo preço atual do produto e baixa o estoque. Lança `RAISE EXCEPTION` em caso de erro. | **Nova venda** |
+| View | `vw_relatorio_vendas` | Junta informações de vendas, clientes e itens para gerar um resumo por venda | Relatório de vendas |
+| Function | `fn_total_venda(p_id_venda)` | Soma os itens da venda e aplica o percentual de desconto, retornando o total final | Detalhe da venda |
+| Procedure | `sp_realizar_venda(p_id_cliente, p_itens jsonb, p_desconto)` | Realiza a venda em uma única transação, validando cliente, estoque e itens antes de confirmar a operação | Cadastro de venda |
 
 ## Estrutura do repositório
-```
+```text
 projeto-vendas-bd/
 ├── src/
 │   ├── app.py
@@ -59,44 +65,48 @@ projeto-vendas-bd/
 │   ├── templates/
 │   └── static/
 ├── database/
-│   ├── 00_criar_banco.sql   (opcional, cria o banco)
-│   ├── tables/      01_criar_tabelas.sql
-│   ├── views/       02_vw_relatorio_vendas.sql
-│   ├── functions/   03_fn_total_venda.sql
-│   ├── procedures/  04_sp_realizar_venda.sql
-│   └── inserts/     05_dados_exemplo.sql
-├── docs/roteiro_video.md
+│   ├── 00_criar_banco.sql
+│   ├── tables/
+│   │   └── 01_criar_tabelas.sql
+│   ├── views/
+│   │   └── 02_vw_relatorio_vendas.sql
+│   ├── functions/
+│   │   └── 03_fn_total_venda.sql
+│   ├── procedures/
+│   │   └── 04_sp_realizar_venda.sql
+│   └── inserts/
+│       └── 05_dados_exemplo.sql
+├── docs/
+│   └── roteiro_video.md
 ├── README.md
 ├── requirements.txt
 ├── .env.example
-└── .gitignore
+├── .gitignore
+└── .venv/
 ```
 
-## Como executar
+## Como executar o projeto
 
 ### 1. Instalar o PostgreSQL
-- **Windows:** baixe o instalador em
-  <https://www.postgresql.org/download/windows/>. Durante a instalação,
-  defina uma senha para o usuário `postgres` e **anote-a**. Deixe a
-  porta padrão `5432`.
-- **Linux (Debian/Ubuntu):** `sudo apt install postgresql`
-- **Mac (Homebrew):** `brew install postgresql && brew services start postgresql`
+- Windows: baixe o instalador em https://www.postgresql.org/download/windows/
+- Linux (Debian/Ubuntu): `sudo apt install postgresql`
+- macOS (Homebrew): `brew install postgresql && brew services start postgresql`
 
-Verifique que o serviço está rodando:
+Depois, confirme que o serviço está funcionando:
 ```bash
 psql -U postgres -c "SELECT version();"
 ```
 
 ### 2. Criar o banco `mercado_pro`
-No terminal (ou pelo pgAdmin), rode:
+No terminal ou no pgAdmin, rode:
 ```bash
 psql -U postgres -c "CREATE DATABASE mercado_pro;"
 ```
-Ou execute o script `database/00_criar_banco.sql` conectado como
-`postgres`.
 
-### 3. Rodar os scripts SQL (na ordem)
-Conecte-se ao banco recém-criado e execute os cinco arquivos **na ordem**:
+Ou execute o script `database/00_criar_banco.sql` conectado como `postgres`.
+
+### 3. Rodar os scripts SQL na ordem correta
+Conecte-se ao banco recém-criado e execute os arquivos abaixo, na sequência:
 ```bash
 psql -U postgres -d mercado_pro -f database/tables/01_criar_tabelas.sql
 psql -U postgres -d mercado_pro -f database/views/02_vw_relatorio_vendas.sql
@@ -105,47 +115,51 @@ psql -U postgres -d mercado_pro -f database/procedures/04_sp_realizar_venda.sql
 psql -U postgres -d mercado_pro -f database/inserts/05_dados_exemplo.sql
 ```
 
-Alternativa visual: abra o **pgAdmin**, clique no banco `mercado_pro`,
-abra o **Query Tool**, cole o conteúdo de cada arquivo (um por vez,
-nessa ordem) e clique em **Executar** (F5).
+Se preferir, abra o pgAdmin, selecione o banco `mercado_pro`, use o Query Tool e execute os arquivos um por um, nessa mesma ordem.
 
-### 4. Configurar o .env
-Copie `.env.example` para `.env` e edite:
-```
+### 4. Configurar o arquivo `.env`
+Copie o arquivo `.env.example` para `.env` e edite a variável:
+```env
 DATABASE_URL=postgresql://postgres:SUA_SENHA@localhost:5432/mercado_pro
 ```
-Troque `SUA_SENHA` pela senha do usuário `postgres` definida na instalação.
 
-### 5. Instalar dependências e rodar o Flask
+Substitua `SUA_SENHA` pela senha do usuário `postgres` que você definiu durante a instalação.
+
+### 5. Instalar dependências e iniciar a aplicação
 ```bash
 python -m venv venv
 
 # Windows:
 venv\Scripts\activate
+
 # Linux/Mac:
 source venv/bin/activate
 
 pip install -r requirements.txt
 
-# (Opcional) testar conexão e checar objetos do banco:
+# Opcional: testar a conexão com o banco e confirmar os objetos criados
 python src/testar_conexao.py
 
 python src/app.py
 ```
 
-Abra <http://127.0.0.1:5000> no navegador.
+Depois, abra no navegador:
+```text
+http://127.0.0.1:5000
+```
 
 ## Dicas de solução de problemas
-- **`password authentication failed`** — a senha no `.env` está errada.
-  Confira a senha definida na instalação do PostgreSQL.
-- **`could not connect to server`** — o serviço do PostgreSQL não está
-  rodando. No Windows, abra "Serviços" e inicie **postgresql-x64-xx**.
-- **`database "mercado_pro" does not exist`** — você pulou o passo 2.
-  Rode `CREATE DATABASE mercado_pro;` como `postgres`.
-- **`relation "clientes" does not exist`** — você pulou o passo 3 ou
-  rodou os scripts em outro banco. Confira com
-  `psql -U postgres -d mercado_pro -c "\dt"`.
-- **Caracteres estranhos (ex.: "cafÃ©")** — o banco não está em UTF-8.
-  Recrie com `CREATE DATABASE mercado_pro ENCODING 'UTF8' TEMPLATE template0;`.
+- `password authentication failed` — a senha do PostgreSQL no arquivo `.env` está incorreta.
+- `could not connect to server` — o serviço do PostgreSQL não está ativo. No Windows, inicie o serviço pelo gerenciador de serviços.
+- `database "mercado_pro" does not exist` — o banco ainda não foi criado ou você está acessando o banco errado.
+- `relation "clientes" does not exist` — os scripts SQL não foram executados no banco certo.
+- Caracteres estranhos, como `cafÃ©`, indicam problema de encoding. Nesse caso, recrie o banco com UTF-8:
+```bash
+CREATE DATABASE mercado_pro ENCODING 'UTF8' TEMPLATE template0;
+```
 
-  link do meu vídeo [   ]
+## Vídeo
+Link do vídeo: [inserir link do vídeo aqui]
+
+## Observação
+Este projeto foi desenvolvido como parte de uma atividade acadêmica e tem como objetivo demonstrar, de forma prática, conceitos de modelagem de dados, SQL e integração com uma aplicação web.
