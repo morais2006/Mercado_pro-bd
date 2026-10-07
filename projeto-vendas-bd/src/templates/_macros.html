@@ -1,0 +1,33 @@
+{% import "_icons.html" as ic %}
+
+{# Formata um valor numérico como R$ 34,90 #}
+{% macro brl(valor) -%}
+R$ {{ ('%.2f' % (valor or 0))|replace('.', ',') }}
+{%- endmacro %}
+
+{# Botões "Editar" e "Excluir" lado a lado com confirmação #}
+{% macro acoes_editar_excluir(url_editar, url_excluir, rotulo='este item') -%}
+<div class="acoes-linha">
+    <a href="{{ url_editar }}" class="btn-acao">{{ ic.icone('editar', 14) }} Editar</a>
+    <form method="post" action="{{ url_excluir }}"
+          onsubmit="return confirm('Excluir {{ rotulo }}?');">
+        <button type="submit" class="btn-acao perigo">{{ ic.icone('lixeira', 14) }} Excluir</button>
+    </form>
+</div>
+{%- endmacro %}
+
+{# Avatar com inicial, cor baseada no id #}
+{% macro avatar(nome, id) -%}
+<span class="avatar-mini c{{ id % 5 }}">{{ (nome or '?')[0]|upper }}</span>
+{%- endmacro %}
+
+{# Badge de estoque conforme quantidade #}
+{% macro badge_estoque(qtd) -%}
+{% if qtd == 0 %}
+    <span class="badge badge-zero">{{ ic.icone('x', 12) }} Sem estoque</span>
+{% elif qtd < 10 %}
+    <span class="badge badge-baixo">{{ ic.icone('alerta', 12) }} {{ qtd }} un.</span>
+{% else %}
+    <span class="badge badge-ok">{{ ic.icone('check', 12) }} {{ qtd }} un.</span>
+{% endif %}
+{%- endmacro %}

@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% import "_icons.html" as ic %}
+{% block titulo %}Painel — Mercado Pro{% endblock %}
+
+{% block conteudo %}
+<section class="hero">
+    <div class="hero-conteudo">
+        <span class="hero-eyebrow">{{ ic.icone('relampago', 14) }} Operação em tempo real</span>
+        <h1>Gestão de vendas, estoque e clientes em um só lugar.</h1>
+        <p>Plataforma inspirada em sistemas de PDV de grandes redes de supermercado — rápida, segura e com integração total ao PostgreSQL.</p>
+        <div class="hero-acoes">
+            <a href="{{ url_for('nova_venda') }}" class="btn btn-primario">
+                {{ ic.icone('mais', 18) }} Registrar nova venda
+            </a>
+            <a href="{{ url_for('relatorio_vendas') }}" class="btn btn-secundario">
+                {{ ic.icone('grafico', 18) }} Ver relatório
+            </a>
+        </div>
+    </div>
+    <div class="hero-arte">
+        {# Ilustração SVG — sacola de compras com produtos #}
+        <svg width="280" height="240" viewBox="0 0 280 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#10b981"/>
+                    <stop offset="1" stop-color="#059669"/>
+                </linearGradient>
+                <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#f59e0b"/>
+                    <stop offset="1" stop-color="#d97706"/>
+                </linearGradient>
+            </defs>
+            {# fundo com círculos #}
+            <circle cx="60" cy="60" r="55" fill="rgba(16,185,129,0.08)"/>
+            <circle cx="220" cy="180" r="40" fill="rgba(59,130,246,0.1)"/>
+
+            {# sacola / carrinho #}
+            <rect x="70" y="80" width="140" height="130" rx="12" fill="url(#g1)"/>
+            <rect x="70" y="80" width="140" height="24" fill="rgba(0,0,0,0.15)"/>
+            <path d="M100 80 V60 a30 30 0 0 1 80 0 V80" stroke="#10b981" stroke-width="8" fill="none" stroke-linecap="round"/>
+
+            {# produtos saindo da sacola #}
+            {# maçã #}
+            <circle cx="110" cy="70" r="18" fill="#ef4444"/>
+            <path d="M110 54 Q114 46 120 48" stroke="#15803d" stroke-width="3" fill="none" stroke-linecap="round"/>
+            {# pão / caixa #}
+            <rect x="135" y="55" width="34" height="30" rx="4" fill="url(#g2)"/>
+            <line x1="135" y1="70" x2="169" y2="70" stroke="rgba(0,0,0,0.2)" stroke-width="2"/>
+            {# cenoura #}
+            <path d="M180 50 L190 85 L170 85 Z" fill="#f97316"/>
+            <path d="M178 46 L182 40 M184 46 L188 42" stroke="#15803d" stroke-width="2.5" stroke-linecap="round"/>
+
+            {# etiqueta de preço #}
+            <g transform="translate(170 140) rotate(-10)">
+                <rect x="0" y="0" width="60" height="36" rx="6" fill="#f59e0b"/>
+                <text x="30" y="23" text-anchor="middle" font-family="Inter" font-weight="800" font-size="14" fill="#422006">R$</text>
+            </g>
+
+            {# tag de desconto #}
+            <circle cx="60" cy="170" r="26" fill="#3b82f6"/>
+            <text x="60" y="175" text-anchor="middle" font-family="Inter" font-weight="800" font-size="13" fill="#fff">-20%</text>
+        </svg>
+    </div>
+</section>
+
+<section class="kpi-strip">
+    <div class="kpi">
+        <div class="kpi-icone verde">{{ ic.icone('banco', 24) }}</div>
+        <div>
+            <div class="kpi-rotulo">SGBD</div>
+            <div class="kpi-valor">PostgreSQL</div>
+        </div>
+    </div>
+    <div class="kpi">
+        <div class="kpi-icone ambar">{{ ic.icone('etiqueta', 24) }}</div>
+        <div>
+            <div class="kpi-rotulo">Tabelas</div>
+            <div class="kpi-valor">4</div>
+        </div>
+    </div>
+    <div class="kpi">
+        <div class="kpi-icone azul">{{ ic.icone('funcao', 24) }}</div>
+        <div>
+            <div class="kpi-rotulo">Recursos ativos</div>
+            <div class="kpi-valor">3</div>
+        </div>
+    </div>
+    <div class="kpi">
+        <div class="kpi-icone rosa">{{ ic.icone('relampago', 24) }}</div>
+        <div>
+            <div class="kpi-rotulo">Transações</div>
+            <div class="kpi-valor">ACID</div>
+        </div>
+    </div>
+</section>
+
+<div class="card">
+    <div class="card-cabecalho">
+        <h2><span class="card-titulo-icone">{{ ic.icone('banco', 20) }}</span> Recursos do banco em uso</h2>
+        <small>Cada recurso tem finalidade própria e aparece em uma tela diferente.</small>
+    </div>
+
+    <div class="grid-recursos">
+        <a class="card-recurso" href="{{ url_for('relatorio_vendas') }}">
+            <span class="selo">{{ ic.icone('grafico', 12) }} VIEW</span>
+            <h3>vw_relatorio_vendas</h3>
+            <p>Junta vendas, clientes e itens para montar o relatório geral com subtotais.</p>
+            <span class="seta">Abrir Relatório &rarr;</span>
+        </a>
+
+        <a class="card-recurso" href="{{ url_for('relatorio_vendas') }}">
+            <span class="selo azul">{{ ic.icone('funcao', 12) }} FUNCTION</span>
+            <h3>fn_total_venda(id)</h3>
+            <p>Calcula o total final de uma venda já aplicando o desconto negociado.</p>
+            <span class="seta">Ver detalhe de uma venda &rarr;</span>
+        </a>
+
+        <a class="card-recurso" href="{{ url_for('nova_venda') }}">
+            <span class="selo ambar">{{ ic.icone('relampago', 12) }} PROCEDURE</span>
+            <h3>sp_realizar_venda</h3>
+            <p>Em uma única transação: valida estoque, grava a venda e baixa o estoque.</p>
+            <span class="seta">Abrir Nova venda &rarr;</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block titulo %}Erro de conexão com o banco{% endblock %}
+
+{% block conteudo %}
+<div class="card">
+    <div class="card-cabecalho">
+        <h1>Não consegui falar com o banco</h1>
+    </div>
+
+    <div class="flash flash-erro">
+        <strong>Detalhe:</strong> {{ mensagem }}
+    </div>
+
+    <h3>Como resolver (PostgreSQL local)</h3>
+    <ol>
+        <li>Verifique se o <strong>serviço do PostgreSQL</strong> está rodando.
+            No Windows, abra <em>Serviços</em> e inicie
+            <code>postgresql-x64-XX</code>.</li>
+        <li>Confira que o banco <code>mercado_pro</code> existe:
+            <code>psql -U postgres -c "\l"</code>. Se não aparecer, rode
+            <code>CREATE DATABASE mercado_pro;</code>.</li>
+        <li>Confira que as tabelas foram criadas:
+            <code>psql -U postgres -d mercado_pro -c "\dt"</code>. Devem
+            aparecer: <code>clientes</code>, <code>produtos</code>,
+            <code>vendas</code>, <code>itens_venda</code>.</li>
+        <li>Confira o arquivo <code>.env</code>. O formato deve ser:
+            <code>DATABASE_URL=postgresql://postgres:SUA_SENHA@localhost:5432/mercado_pro</code>.</li>
+        <li>Pare o Flask (Ctrl+C) e rode novamente
+            <code>python src/app.py</code>.</li>
+    </ol>
+
+    <p>Para checar rapidamente, rode: <code>python src/testar_conexao.py</code></p>
+</div>
+{% endblock %}

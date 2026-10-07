@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% import "_icons.html" as ic %}
+{% block titulo %}Venda #{{ venda.id }} — Mercado Pro{% endblock %}
+
+{% block conteudo %}
+<div class="card">
+    <div class="card-cabecalho">
+        <h1><span class="card-titulo-icone">{{ ic.icone('etiqueta', 20) }}</span> Venda #{{ venda.id }}</h1>
+        <a href="{{ url_for('relatorio_vendas') }}" class="btn btn-fantasma">
+            {{ ic.icone('voltar', 16) }} Voltar ao relatório
+        </a>
+    </div>
+
+    <div class="kpi-strip" style="margin-bottom:0;">
+        <div class="kpi">
+            <div class="kpi-icone azul">{{ ic.icone('cliente', 24) }}</div>
+            <div>
+                <div class="kpi-rotulo">Cliente</div>
+                <div class="kpi-valor" style="font-size:1.05rem">{{ venda.nome_cliente }}</div>
+                <small>{{ venda.email_cliente }}</small>
+            </div>
+        </div>
+        <div class="kpi">
+            <div class="kpi-icone verde">{{ ic.icone('relampago', 24) }}</div>
+            <div>
+                <div class="kpi-rotulo">Data</div>
+                <div class="kpi-valor" style="font-size:1.05rem">{{ venda.data_venda.strftime('%d/%m/%Y') }}</div>
+                <small>{{ venda.data_venda.strftime('%H:%M') }}</small>
+            </div>
+        </div>
+        <div class="kpi">
+            <div class="kpi-icone ambar">{{ ic.icone('etiqueta', 24) }}</div>
+            <div>
+                <div class="kpi-rotulo">Desconto</div>
+                <div class="kpi-valor">{{ ('%.2f' % venda.desconto_percentual)|replace('.', ',') }}%</div>
+            </div>
+        </div>
+        <div class="kpi">
+            <div class="kpi-icone rosa">{{ ic.icone('carrinho', 24) }}</div>
+            <div>
+                <div class="kpi-rotulo">Itens</div>
+                <div class="kpi-valor">{{ itens|length }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-cabecalho">
+        <h2><span class="card-titulo-icone">{{ ic.icone('carrinho', 20) }}</span> Produtos vendidos</h2>
+    </div>
+    <div class="tabela-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th class="num">Qtd.</th>
+                    <th class="num">Preço unit.</th>
+                    <th class="num">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for i in itens %}
+                <tr>
+                    <td>
+                        <div class="chip-produto">
+                            <span class="icone-box">{{ ic.icone('caixa', 18) }}</span>
+                            <strong>{{ i.nome_produto }}</strong>
+                        </div>
+                    </td>
+                    <td class="num"><span class="badge badge-neutro">{{ i.quantidade }} un.</span></td>
+                    <td class="num">{{ m.brl(i.preco_unitario) }}</td>
+                    <td class="num destaque-total">{{ m.brl(i.subtotal_item) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3" class="num">Total final (com desconto aplicado):</th>
+                    <th class="num destaque-total-grande">{{ m.brl(total) }}</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block rodape %}
+<div class="aviso-recurso">
+    {{ ic.icone('funcao', 16) }}
+    <span>Esta tela usa a <strong>FUNCTION <code>fn_total_venda(id)</code></strong> — calcula o total final já aplicando o desconto.</span>
+</div>
+{% endblock %}

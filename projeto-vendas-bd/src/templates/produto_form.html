@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import "_icons.html" as ic %}
+{% block titulo %}{{ 'Editar' if produto else 'Novo' }} produto — Mercado Pro{% endblock %}
+
+{% block conteudo %}
+<div class="card" style="max-width:620px; margin: 0 auto;">
+    <div class="card-cabecalho">
+        <h1>
+            <span class="card-titulo-icone">{{ ic.icone('caixa', 20) }}</span>
+            {{ 'Editar' if produto else 'Novo' }} produto
+        </h1>
+    </div>
+
+    <form method="post">
+        <label><strong>Nome do produto</strong>
+            <input type="text" name="nome" required placeholder="Ex.: Arroz 5kg"
+                   value="{{ produto.nome if produto else '' }}">
+        </label>
+        <label><strong>Preço (R$)</strong>
+            <input type="number" step="0.01" min="0" name="preco" required placeholder="0,00"
+                   value="{{ produto.preco if produto else '' }}">
+        </label>
+        <label><strong>Estoque (unidades)</strong>
+            <input type="number" min="0" name="estoque" required placeholder="0"
+                   value="{{ produto.estoque if produto else '' }}">
+        </label>
+
+        <div class="acoes-form">
+            <button type="submit" class="btn btn-primario">{{ ic.icone('check', 18) }} Salvar</button>
+            <a href="{{ url_for('listar_produtos') }}" class="btn btn-fantasma">
+                {{ ic.icone('x', 16) }} Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

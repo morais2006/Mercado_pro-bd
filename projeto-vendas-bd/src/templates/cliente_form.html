@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import "_icons.html" as ic %}
+{% block titulo %}{{ 'Editar' if cliente else 'Novo' }} cliente — Mercado Pro{% endblock %}
+
+{% block conteudo %}
+<div class="card" style="max-width:620px; margin: 0 auto;">
+    <div class="card-cabecalho">
+        <h1>
+            <span class="card-titulo-icone">{{ ic.icone('cliente', 20) }}</span>
+            {{ 'Editar' if cliente else 'Novo' }} cliente
+        </h1>
+    </div>
+
+    <form method="post">
+        <label><strong>Nome completo</strong>
+            <input type="text" name="nome" required placeholder="Ex.: Maria da Silva"
+                   value="{{ cliente.nome if cliente else '' }}">
+        </label>
+        <label><strong>E-mail</strong>
+            <input type="email" name="email" required placeholder="exemplo@email.com"
+                   value="{{ cliente.email if cliente else '' }}">
+        </label>
+        <label><strong>Telefone</strong>
+            <input type="text" name="telefone" placeholder="(00) 00000-0000"
+                   value="{{ cliente.telefone if cliente else '' }}">
+        </label>
+
+        <div class="acoes-form">
+            <button type="submit" class="btn btn-primario">{{ ic.icone('check', 18) }} Salvar</button>
+            <a href="{{ url_for('listar_clientes') }}" class="btn btn-fantasma">
+                {{ ic.icone('x', 16) }} Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% import "_icons.html" as ic %}
+{% block titulo %}Produtos — Mercado Pro{% endblock %}
+
+{% block conteudo %}
+{% set total_estoque = produtos|sum(attribute='estoque') %}
+{% set valor_total = namespace(v=0) %}
+{% for p in produtos %}{% set valor_total.v = valor_total.v + (p.preco * p.estoque) %}{% endfor %}
+{% set baixo = produtos|selectattr('estoque', 'lt', 10)|list|length %}
+
+<div class="kpi-strip">
+    <div class="kpi">
+        <div class="kpi-icone verde">{{ ic.icone('caixa', 24) }}</div>
+        <div>
+            <div class="kpi-rotulo">Produtos</div>
+            <div class="kpi-valor">{{ produtos|length }}</div>
+        </div>
+    </div>
+    <div class="kpi">
+        <div class="kpi-icone azul">{{ ic.icone('etiqueta', 24) }}</div>
+        <div>
+            <div class="kpi-rotulo">Unidades em estoque</div>
+            <div class="kpi-valor">{{ total_estoque }}</div>
+        </div>
+    </div>
+    <div class="kpi">
+        <div class="kpi-icone ambar">{{ ic.icone('dinheiro', 24) }}</div>
+        <div>
+            <div class="kpi-rotulo">Valor do estoque</div>
+            <div class="kpi-valor">{{ m.brl(valor_total.v) }}</div>
+        </div>
+    </div>
+    <div class="kpi">
+        <div class="kpi-icone rosa">{{ ic.icone('alerta', 24) }}</div>
+        <div>
+            <div class="kpi-rotulo">Estoque baixo</div>
+            <div class="kpi-valor">{{ baixo }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-cabecalho">
+        <h1><span class="card-titulo-icone">{{ ic.icone('caixa', 20) }}</span> Produtos</h1>
+        <a href="{{ url_for('novo_produto') }}" class="btn btn-primario">
+            {{ ic.icone('mais', 18) }} Novo produto
+        </a>
+    </div>
+
+    <div class="tabela-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th class="num">Preço</th>
+                    <th>Estoque</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for p in produtos %}
+                <tr>
+                    <td>
+                        <div class="chip-produto">
+                            <span class="icone-box">{{ ic.icone('caixa', 18) }}</span>
+                            <strong>{{ p.nome }}</strong>
+                        </div>
+                    </td>
+                    <td class="num">{{ m.brl(p.preco) }}</td>
+                    <td>{{ m.badge_estoque(p.estoque) }}</td>
+                    <td>
+                        {{ m.acoes_editar_excluir(
+                            url_for('editar_produto', id_produto=p.id),
+                            url_for('excluir_produto', id_produto=p.id),
+                            'o produto ' ~ p.nome
+                        ) }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4" style="text-align:center; padding:2rem; color:var(--txt-fraco)">
+                    Nenhum produto cadastrado ainda.
+                </td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

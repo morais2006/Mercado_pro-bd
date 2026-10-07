@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block titulo %}Mercado Pro — Sistema de Vendas{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2310b981'%3E%3Cpath d='M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.6-1.4 2.4C5 15.3 5.5 17 7 17h12v-2H7l1.1-2h7.4c.8 0 1.4-.4 1.7-1l3.6-6.6c.2-.3.2-.8-.1-1.1S20 4 19.6 4H5.2L4.3 2H1z'/%3E%3C/svg%3E">
+</head>
+<body>
+{% import "_icons.html" as ic %}
+{% set rota = request.endpoint or '' %}
+
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="marca" href="{{ url_for('index') }}">
+            <span class="marca-icone">{{ ic.icone('carrinho', 22) }}</span>
+            <span>
+                Mercado Pro
+                <span class="marca-sub" style="display:block;">Sistema de Vendas</span>
+            </span>
+        </a>
+
+        <ul class="menu">
+            <li><a href="{{ url_for('listar_clientes') }}"
+                   class="{{ 'ativo' if 'cliente' in rota else '' }}">
+                   {{ ic.icone('clientes', 16) }} Clientes</a></li>
+            <li><a href="{{ url_for('listar_produtos') }}"
+                   class="{{ 'ativo' if 'produto' in rota else '' }}">
+                   {{ ic.icone('caixa', 16) }} Produtos</a></li>
+            <li><a href="{{ url_for('nova_venda') }}"
+                   class="{{ 'ativo' if rota == 'nova_venda' else '' }}">
+                   {{ ic.icone('mais', 16) }} Nova venda</a></li>
+            <li><a href="{{ url_for('relatorio_vendas') }}"
+                   class="{{ 'ativo' if rota in ['relatorio_vendas', 'detalhe_venda'] else '' }}">
+                   {{ ic.icone('grafico', 16) }} Relatório</a></li>
+        </ul>
+
+        <div class="pill-usuario">
+            <span class="avatar">R</span>
+            <span class="nome">Operador</span>
+        </div>
+    </div>
+</header>
+
+<main class="app">
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+        {% if mensagens %}
+            {% for categoria, msg in mensagens %}
+                <div class="flash flash-{{ categoria }}">
+                    {% if categoria == 'sucesso' %}{{ ic.icone('check', 20) }}
+                    {% else %}{{ ic.icone('alerta', 20) }}{% endif %}
+                    <span>{{ msg }}</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block conteudo %}{% endblock %}
+</main>
+
+<footer class="app">
+    {% block rodape %}{% endblock %}
+    <div>Mercado Pro © 2026 — Trabalho de Banco de Dados · View · Function · Procedure</div>
+</footer>
+</body>
+</html>

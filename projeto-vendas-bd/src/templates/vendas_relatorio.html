@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% import "_macros.html" as m %}
+{% import "_icons.html" as ic %}
+{% block titulo %}Relatório de vendas — Mercado Pro{% endblock %}
+
+{% block conteudo %}
+{% set receita = vendas|sum(attribute='subtotal') %}
+{% set itens_totais = vendas|sum(attribute='quantidade_itens') %}
+{% set ticket = (receita / vendas|length) if vendas|length > 0 else 0 %}
+
+<div class="kpi-strip">
+    <div class="kpi">
+        <div class="kpi-icone verde">{{ ic.icone('grafico', 24) }}</div>
+        <div>
+            <div class="kpi-rotulo">Total de vendas</div>
+            <div class="kpi-valor">{{ vendas|length }}</div>
+        </div>
+    </div>
+    <div class="kpi">
+        <div class="kpi-icone ambar">{{ ic.icone('dinheiro', 24) }}</div>
+        <div>
+            <div class="kpi-rotulo">Receita (subtotal)</div>
+            <div class="kpi-valor">{{ m.brl(receita) }}</div>
+        </div>
+    </div>
+    <div class="kpi">
+        <div class="kpi-icone azul">{{ ic.icone('carrinho', 24) }}</div>
+        <div>
+            <div class="kpi-rotulo">Itens vendidos</div>
+            <div class="kpi-valor">{{ itens_totais }}</div>
+        </div>
+    </div>
+    <div class="kpi">
+        <div class="kpi-icone rosa">{{ ic.icone('etiqueta', 24) }}</div>
+        <div>
+            <div class="kpi-rotulo">Ticket médio</div>
+            <div class="kpi-valor">{{ m.brl(ticket) }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-cabecalho">
+        <h1><span class="card-titulo-icone">{{ ic.icone('grafico', 20) }}</span> Relatório de vendas</h1>
+        <a href="{{ url_for('nova_venda') }}" class="btn btn-primario">
+            {{ ic.icone('mais', 18) }} Nova venda
+        </a>
+    </div>
+
+    <div class="tabela-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th class="num">#</th>
+                    <th>Data</th>
+                    <th>Cliente</th>
+                    <th class="num">Itens</th>
+                    <th class="num">Subtotal</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for v in vendas|sort(attribute='id_venda') %}
+                <tr>
+                    <td class="num"><strong>#{{ v.id_venda }}</strong></td>
+                    <td>{{ v.data_venda.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>
+                        <div class="cel-com-avatar">
+                            {{ m.avatar(v.nome_cliente, v.id_venda) }}
+                            <div class="texto"><strong>{{ v.nome_cliente }}</strong></div>
+                        </div>
+                    </td>
+                    <td class="num"><span class="badge badge-neutro">{{ v.quantidade_itens }} un.</span></td>
+                    <td class="num destaque-total">{{ m.brl(v.subtotal) }}</td>
+                    <td>
+                        <a class="btn-acao ok" href="{{ url_for('detalhe_venda', id_venda=v.id_venda) }}">
+                            {{ ic.icone('olho', 14) }} Ver detalhes
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" style="text-align:center; padding:2rem; color:var(--txt-fraco)">
+                    Nenhuma venda registrada ainda.
+                </td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block rodape %}
+<div class="aviso-recurso">
+    {{ ic.icone('grafico', 16) }}
+    <span>Esta tela usa a <strong>VIEW <code>vw_relatorio_vendas</code></strong> — junta vendas, clientes e itens_venda.</span>
+</div>
+{% endblock %}

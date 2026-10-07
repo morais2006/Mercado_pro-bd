@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% import "_icons.html" as ic %}
+{% block titulo %}Nova venda — Mercado Pro{% endblock %}
+
+{% block conteudo %}
+<div class="card">
+    <div class="card-cabecalho">
+        <h1><span class="card-titulo-icone">{{ ic.icone('relampago', 20) }}</span> Nova venda</h1>
+        <span class="badge badge-neutro">{{ ic.icone('banco', 12) }} CALL sp_realizar_venda(...)</span>
+    </div>
+
+    <form method="post" id="form-venda">
+        <label>
+            <strong>Cliente</strong>
+            <select name="id_cliente" required>
+                <option value="">— Selecione o cliente —</option>
+                {% for c in clientes %}
+                    <option value="{{ c.id }}">{{ c.nome }} · {{ c.email }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <h3 style="margin-top:1.5rem;">{{ ic.icone('carrinho', 18) }} Itens do carrinho</h3>
+        <div class="tabela-wrap">
+            <table id="tabela-itens">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th class="num" style="width:150px">Quantidade</th>
+                        <th class="num" style="width:150px">Subtotal</th>
+                        <th style="width:60px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="linha-item">
+                        <td>
+                            <select name="id_produto" class="sel-produto">
+                                <option value="" data-preco="0">— Produto —</option>
+                                {% for p in produtos %}
+                                    <option value="{{ p.id }}" data-preco="{{ p.preco }}">
+                                        {{ p.nome }} · R$ {{ ('%.2f' % p.preco)|replace('.', ',') }} · estoque {{ p.estoque }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td class="num">
+                            <input type="number" name="quantidade" min="1" value="1" class="inp-quantidade">
+                        </td>
+                        <td class="num"><span class="subtotal-item destaque-total">R$ 0,00</span></td>
+                        <td>
+                            <button type="button" onclick="removerLinha(this)" class="btn-acao perigo" title="Remover">
+                                {{ ic.icone('lixeira', 14) }}
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p style="margin-top:0.8rem;">
+            <button type="button" onclick="adicionarLinha()" class="btn btn-fantasma">
+                {{ ic.icone('mais', 16) }} Adicionar item
+            </button>
+        </p>
+
+        <label>
+            <strong>Desconto (%)</strong>
+            <input type="number" step="0.01" min="0" max="100" name="desconto" value="0" id="inp-desconto">
+        </label>
+
+        <div class="total-estimado">
+            <div>
+                <div class="rotulo">{{ ic.icone('dinheiro', 20) }} Total estimado</div>
+                <small>O cálculo oficial é feito no banco por <code>fn_total_venda</code>.</small>
+            </div>
+            <div class="valor" id="total-estimado">R$ 0,00</div>
+        </div>
+
+        <div class="acoes-form">
+            <button type="submit" class="btn btn-primario">
+                {{ ic.icone('check', 18) }} Confirmar venda
+            </button>
+            <a href="{{ url_for('relatorio_vendas') }}" class="btn btn-fantasma">
+                {{ ic.icone('x', 16) }} Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<template id="template-linha">
+    <tr class="linha-item">
+        <td>
+            <select name="id_produto" class="sel-produto">
+                <option value="" data-preco="0">— Produto —</option>
+                {% for p in produtos %}
+                    <option value="{{ p.id }}" data-preco="{{ p.preco }}">
+                        {{ p.nome }} · R$ {{ ('%.2f' % p.preco)|replace('.', ',') }} · estoque {{ p.estoque }}
+                    </option>
+                {% endfor %}
+            </select>
+        </td>
+        <td class="num">
+            <input type="number" name="quantidade" min="1" value="1" class="inp-quantidade">
+        </td>
+        <td class="num"><span class="subtotal-item destaque-total">R$ 0,00</span></td>
+        <td>
+            <button type="button" onclick="removerLinha(this)" class="btn-acao perigo" title="Remover">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+        </td>
+    </tr>
+</template>
+
+<script>
+    function formatarBRL(valor) {
+        return 'R$ ' + (valor || 0).toFixed(2).replace('.', ',');
+    }
+    function recalcular() {
+        let total = 0;
+        document.querySelectorAll('#tabela-itens tbody .linha-item').forEach(linha => {
+            const sel = linha.querySelector('.sel-produto');
+            const inp = linha.querySelector('.inp-quantidade');
+            const span = linha.querySelector('.subtotal-item');
+            const preco = parseFloat(sel.selectedOptions[0]?.dataset.preco || 0);
+            const qtd = parseInt(inp.value || 0, 10);
+            const sub = preco * (isNaN(qtd) ? 0 : qtd);
+            span.textContent = formatarBRL(sub);
+            total += sub;
+        });
+        const desc = parseFloat(document.getElementById('inp-desconto').value || 0);
+        const totalFinal = total * (1 - (isNaN(desc) ? 0 : desc) / 100);
+        document.getElementById('total-estimado').textContent = formatarBRL(totalFinal);
+    }
+    function adicionarLinha() {
+        const tpl = document.getElementById('template-linha');
+        document.querySelector('#tabela-itens tbody').appendChild(tpl.content.cloneNode(true));
+        recalcular();
+    }
+    function removerLinha(btn) {
+        const tbody = document.querySelector('#tabela-itens tbody');
+        if (tbody.rows.length > 1) { btn.closest('tr').remove(); recalcular(); }
+    }
+    document.getElementById('form-venda').addEventListener('input', recalcular);
+    document.getElementById('form-venda').addEventListener('change', recalcular);
+    recalcular();
+</script>
+{% endblock %}
+
+{% block rodape %}
+<div class="aviso-recurso">
+    {{ ic.icone('relampago', 16) }}
+    <span>Esta tela usa a <strong>PROCEDURE <code>sp_realizar_venda</code></strong> — chamada via <code>CALL</code> em uma única transação.</span>
+</div>
+{% endblock %}
