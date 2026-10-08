@@ -159,7 +159,7 @@ CREATE DATABASE mercado_pro ENCODING 'UTF8' TEMPLATE template0;
 ```
 
 ## Vídeo
-Link do vídeo: [inserir link do vídeo aqui]
+Link do vídeo: [https://youtu.be/ihbQ2Qbo51Y?feature=shared]
 
 ## Observação
 Este projeto foi desenvolvido como parte de uma atividade acadêmica e tem como objetivo demonstrar, de forma prática, conceitos de modelagem de dados, SQL e integração entre um banco relacional e uma aplicação web.
